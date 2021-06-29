@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(TargetFramework)' == ''">net462;net472;net48;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TargetFramework)' == '' AND '$(IncludeDev)' == ''">net462;net472;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TargetFramework)' == '' AND '$(IncludeDev)' != ''">net462;net472;net48;net5.0</TargetFrameworks>
+   
     <LangVersion>latest</LangVersion>
     <SignAssembly>false</SignAssembly>
     <IsPackable>false</IsPackable>
@@ -72,9 +74,14 @@
         <DefineConstants>$(DefineConstants);UNITY_V5</DefineConstants>
         <DefineConstants Condition="'$(TargetFrameworks)' == ''">$(DefineConstants);BEHAVIOR_V5</DefineConstants>
       </PropertyGroup>
+      <ItemGroup Condition="Exists('$(UnityContainer)') ">
+        <ProjectReference Include="$(UnityContainer)" />
+      </ItemGroup>
+      <ItemGroup Condition="!Exists('$(UnityContainer)') ">
+        <PackageReference Condition="$(TargetFramework.StartsWith('net47'))" Include="Unity.Container" Version="5.11.*" />
+        <PackageReference Condition="$(TargetFramework.StartsWith('net48'))" Include="Unity.Container" Version="5.12.*-*" />
+      </ItemGroup>
       <ItemGroup>
-        <ProjectReference Condition="Exists('$(UnityContainer)') " Include="$(UnityContainer)" />
-        <PackageReference Condition="!Exists('$(UnityContainer)')" Include="Unity.Container" Version="5.11.*" />
         
         <Compile Remove="Patterns\Abstractions\Resolvers\ValidatingResolverFactory.cs" />
         <Compile Remove="Patterns\Abstractions\Resolvers\ValidatintResolver.cs" />
